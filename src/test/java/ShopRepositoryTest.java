@@ -2,6 +2,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ShopRepositoryTest {
 
@@ -44,7 +45,7 @@ public class ShopRepositoryTest {
 
         repository.add(product1);
 
-        Assertions.assertThrows(NotFoundException.class,
+        assertThrows(NotFoundException.class,
                 () -> repository.removeById(2),
                 "Element with id: 2 not found");
     }
@@ -70,5 +71,16 @@ public class ShopRepositoryTest {
 
         Product found = repository.findById(2);
         Assertions.assertNull(found);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenAddingDuplicateId() {
+        ShopRepository repository = new ShopRepository();
+        repository.add(new Product(1, "Book", 100));
+
+        Exception exception = assertThrows(AlreadyExistsException.class, () -> repository.add(new Product(1, "Pen", 50)));
+
+        String expectedMessage = "Element with id: 1 already exists";
+        assertEquals(expectedMessage, exception.getMessage());
     }
 }
